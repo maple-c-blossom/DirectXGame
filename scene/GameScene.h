@@ -48,6 +48,7 @@ class GameScene {
 	Audio* audio_ = nullptr;
 	DebugText* debugText_ = nullptr;
 
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>

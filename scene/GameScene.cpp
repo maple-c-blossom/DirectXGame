@@ -14,9 +14,12 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+	
 }
 
-void GameScene::Update() {}
+void GameScene::Update() { 
+
+}
 
 void GameScene::Draw() {
 
@@ -47,14 +50,13 @@ void GameScene::Draw() {
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
-#pragma endregion
+#pragma endregion 3Dオブジェクト描画
 
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
 
 	/// <summary>
-	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
 	// デバッグテキストの描画

@@ -25,11 +25,11 @@ void GameScene::Initialize() {
 	//soundHandle_ = audio_->LoadWave("se_sad03.wav");
 	//voiceHandle_ = audio_->PlayWave(soundHandle_, true);
 
-	viewProjection_.eye = {0, 0, -50};
+	//viewProjection_.eye = {0, 0, -50};
 
-	viewProjection_.target = {10, 0, 0};
+	//viewProjection_.target = {10, 0, 0};
 
-	viewProjection_.up = {1.0f, 0.0f, 0.0f};
+	//viewProjection_.up = {1.0f, 0.0f, 0.0f};
 
 	viewProjection_.Initialize();
 
@@ -47,6 +47,12 @@ void GameScene::Initialize() {
 		worldTransform_[i].Initialize();
 	}
 
+	viewProjection_.fovAngleY = XMConvertToRadians(10.0f);
+
+	viewProjection_.aspectRatio = 1.0f;
+
+	viewProjection_.nearZ = 52.0f;
+	viewProjection_.farZ = 53.0f;
 }
 
 void GameScene::Update() 
@@ -54,38 +60,58 @@ void GameScene::Update()
 
 	#pragma region 視点移動
 
-	XMFLOAT3 move = {0, 0, 0};
-	const float kEyeSpeed = 0.2f;
+	//XMFLOAT3 move = {0, 0, 0};
+	//const float kEyeSpeed = 0.2f;
+	//if (input_->PushKey(DIK_W)) {
+	//	move = {0, 0, kEyeSpeed};
+	//} else if (input_->PushKey(DIK_S)) {
+	//	move = {0, 0, -kEyeSpeed};
+	//}
+	//viewProjection_.eye.x += move.x;
+	//viewProjection_.eye.y += move.y;
+	//viewProjection_.eye.z += move.z;
+
+	////注視点
+	//XMFLOAT3 moveTarget = {0, 0, 0};
+	//const float kTargetSpeed = 0.2f;
+	//if (input_->PushKey(DIK_LEFT)) {
+	//	moveTarget = {-kTargetSpeed, 0, 0};
+	//} else if (input_->PushKey(DIK_RIGHT)) {
+	//	moveTarget = {kTargetSpeed, 0, 0};
+	//}
+
+	//viewProjection_.target.x += moveTarget.x;
+	//viewProjection_.target.y += moveTarget.y;
+	//viewProjection_.target.z += moveTarget.z;
+
+	////上方向
+	//const float kUpRotSpeed = 0.05f;
+	//if (input_->PushKey(DIK_SPACE)) {
+	//	viewAngle += kUpRotSpeed ;
+	//	viewAngle = fmodf(viewAngle, XM_2PI);
+	//}
+
+	//viewProjection_.up = {cosf(viewAngle), sinf(viewAngle), 0.0f};
+	
 	if (input_->PushKey(DIK_W)) {
-		move = {0, 0, kEyeSpeed};
+	
+		viewProjection_.fovAngleY += 0.01f;
+		viewProjection_.fovAngleY = min(viewProjection_.fovAngleY, XM_PI);
 	} else if (input_->PushKey(DIK_S)) {
-		move = {0, 0, -kEyeSpeed};
-	}
-	viewProjection_.eye.x += move.x;
-	viewProjection_.eye.y += move.y;
-	viewProjection_.eye.z += move.z;
+		viewProjection_.fovAngleY -= 0.01f;
+		viewProjection_.fovAngleY = max(viewProjection_.fovAngleY, 0.01f);
 
-	//注視点
-	XMFLOAT3 moveTarget = {0, 0, 0};
-	const float kTargetSpeed = 0.2f;
-	if (input_->PushKey(DIK_LEFT)) {
-		moveTarget = {0, 0, -kTargetSpeed};
-	} else if (input_->PushKey(DIK_RIGHT)) {
-		moveTarget = {0, 0, kTargetSpeed};
+	}
+	
+	if (input_->PushKey(DIK_UP)) {
+	
+		viewProjection_.nearZ += 0.1f;
+	} else if (input_->PushKey(DIK_DOWN)) {
+		viewProjection_.nearZ -= 0.01f;
+
 	}
 
-	viewProjection_.target.x += moveTarget.x;
-	viewProjection_.target.y += moveTarget.y;
-	viewProjection_.target.z += moveTarget.z;
 
-	//上方向
-	const float kUpRotSpeed = 0.05f;
-	if (input_->PushKey(DIK_SPACE)) {
-		viewAngle += kUpRotSpeed ;
-		viewAngle = fmodf(viewAngle, XM_2PI);
-	}
-
-	viewProjection_.up = {cosf(viewAngle), sinf(viewAngle), 0.0f};
 
 	viewProjection_.UpdateMatrix();
 	#pragma endregion
@@ -113,6 +139,14 @@ void GameScene::Update()
 	debugText_->Printf(
 	  "up : (%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y,
 	  viewProjection_.up.z);
+
+	debugText_->SetPos(50, 120);
+
+	debugText_->Printf("fovAngleY(Degree) : %f", viewProjection_.fovAngleY);
+
+	debugText_->SetPos(50, 140);
+
+	debugText_->Printf("nearZ : %f", viewProjection_.nearZ);
 
 
 }

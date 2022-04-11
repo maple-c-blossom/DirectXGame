@@ -1,6 +1,7 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include <random>
 
 using namespace DirectX;
 using namespace std;
@@ -23,38 +24,96 @@ void GameScene::Initialize() {
 	model_ = Model::Create();
 	//soundHandle_ = audio_->LoadWave("se_sad03.wav");
 	//voiceHandle_ = audio_->PlayWave(soundHandle_, true);
-	worldTransform_.Initialize();
+
+	viewProjection_.eye = {0, 0, -50};
+
+	viewProjection_.target = {10, 0, 0};
+
+	viewProjection_.up = {1.0f, 0.0f, 0.0f};
+
 	viewProjection_.Initialize();
+
+	random_device seed_gen;
+	mt19937_64 engin(seed_gen());
+	uniform_real_distribution<float> rotDist(0.0f, XM_2PI);
+	uniform_real_distribution<float> posDist(-10.0f, 10.0f);
+
+	for (int i = 0; i < _countof(worldTransform_); i++) 
+	{
+		worldTransform_[i].scale_ = {1.0f, 1.0f, 1.0f};
+		worldTransform_[i].rotation_ = {rotDist(engin), rotDist(engin), rotDist(engin)};
+		worldTransform_[i].translation_ = {posDist(engin), posDist(engin), posDist(engin)};
+
+		worldTransform_[i].Initialize();
+	}
+
 }
 
 void GameScene::Update() 
 { 
-	//if (input_->TriggerKey(DIK_SPACE)) 
-	//{
-	//	audio_->StopWave(voiceHandle_);
-	//}
 
-	worldTransform_.scale_ = {5.0f, 5.0f, 5.0f};
-	worldTransform_.rotation_ = {0.785398f, 0.785398f, 0.0f};
-	worldTransform_.translation_ = {10.0f, 10.0f, 10.0f};
+	#pragma region 視点移動
 
-	worldTransform_.UpdateMatrix();
+	XMFLOAT3 move = {0, 0, 0};
+	const float kEyeSpeed = 0.2f;
+	if (input_->PushKey(DIK_W)) {
+		move = {0, 0, kEyeSpeed};
+	} else if (input_->PushKey(DIK_S)) {
+		move = {0, 0, -kEyeSpeed};
+	}
+	viewProjection_.eye.x += move.x;
+	viewProjection_.eye.y += move.y;
+	viewProjection_.eye.z += move.z;
+
+	//注視点
+	XMFLOAT3 moveTarget = {0, 0, 0};
+	const float kTargetSpeed = 0.2f;
+	if (input_->PushKey(DIK_LEFT)) {
+		moveTarget = {0, 0, -kTargetSpeed};
+	} else if (input_->PushKey(DIK_RIGHT)) {
+		moveTarget = {0, 0, kTargetSpeed};
+	}
+
+	viewProjection_.target.x += moveTarget.x;
+	viewProjection_.target.y += moveTarget.y;
+	viewProjection_.target.z += moveTarget.z;
+
+	//上方向
+	const float kUpRotSpeed = 0.05f;
+	if (input_->PushKey(DIK_SPACE)) {
+		viewAngle += kUpRotSpeed ;
+		viewAngle = fmodf(viewAngle, XM_2PI);
+	}
+
+	viewProjection_.up = {cosf(viewAngle), sinf(viewAngle), 0.0f};
+
+	viewProjection_.UpdateMatrix();
+	#pragma endregion
+
+
+	for (int i = 0; i < _countof(worldTransform_); i++) {
+	
+		worldTransform_[i].UpdateMatrix();
+	}
+
 	debugText_->SetPos(50, 70);
 
+	debugText_->Printf(
+	  "eye : (%f,%f,%f)\n", viewProjection_.eye.x, viewProjection_.eye.y,
+	  viewProjection_.eye.z);
 
+	debugText_->SetPos(50, 90);
 
 	debugText_->Printf(
-	  "translation : (%f,%f,%f)\n", worldTransform_.translation_.x,
-	  worldTransform_.translation_.y, worldTransform_.translation_.z);
-
-		debugText_->SetPos(50, 90);
-
-	debugText_->Printf("rotation : (%f,%f,%f)",worldTransform_.rotation_.x, worldTransform_.rotation_.y,worldTransform_.rotation_.z);
-		
+	  "target : (%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y,
+	  viewProjection_.target.z);
 
 	debugText_->SetPos(50, 110);
 
-	debugText_->Printf("scale : (%f,%f,%f)", worldTransform_.scale_.x, worldTransform_.scale_.y, worldTransform_.scale_.z);
+	debugText_->Printf(
+	  "up : (%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y,
+	  viewProjection_.up.z);
+
 
 }
 
@@ -82,7 +141,10 @@ void GameScene::Draw() {
 	Model::PreDraw(commandList);
 
 	/// <summary>
-	model_->Draw(worldTransform_, viewProjection_,textreHandle_);
+	for (int i = 0; i < _countof(worldTransform_); i++) 
+	{
+		model_->Draw(worldTransform_[i], viewProjection_, textreHandle_);
+	}
 	/// </summary>
 
 	// 3Dオブジェクト描画後処理

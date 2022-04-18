@@ -36,7 +36,8 @@ void GameScene::Initialize() {
 
 	worldTransform_[0].Initialize();
 
-	worldTransform_[1].translation_ = {0.0f, 4.5f, 0.0f};
+	worldTransform_[1].translation_ = {0.0f, 0.0f, 5.0f};
+	worldTransform_[1].scale_ = { 0.5f,0.5f,0.5f };
 	worldTransform_[1].parent_ = &worldTransform_[0];
 	worldTransform_[1].Initialize();
 
@@ -48,7 +49,7 @@ void GameScene::Initialize() {
 		}
 		else
 		{
-			Rales[i].translation_.z = Rales[i - 1].translation_.z + 10.0f;
+			Rales[i].translation_.z = Rales[i - 1].translation_.z + 56.0f;
 			Rales[i].parent_ = &Rales[i - 1];
 		}
 
@@ -110,9 +111,9 @@ void GameScene::Update()
 	worldTransform_[0].translation_.z += move.z;
 
 
-	viewProjection_.eye.x = worldTransform_[0].translation_.x + (50 * -ObjFront3D.x);
-	viewProjection_.eye.y = worldTransform_[0].translation_.y + 10;
-	viewProjection_.eye.z = worldTransform_[0].translation_.z + (50 * -ObjFront3D.z);
+	viewProjection_.eye.x = worldTransform_[0].translation_.x + (20 * -ObjFront3D.x);
+	viewProjection_.eye.y = worldTransform_[0].translation_.y + 15;
+	viewProjection_.eye.z = worldTransform_[0].translation_.z + (20 * -ObjFront3D.z);
 
 	viewProjection_.target.x = worldTransform_[0].translation_.x;
 	viewProjection_.target.y = worldTransform_[0].translation_.y;

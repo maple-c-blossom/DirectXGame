@@ -49,7 +49,7 @@ void GameScene::Initialize() {
 		}
 		else
 		{
-			Rales[i].translation_.z = Rales[i - 1].translation_.z + 56.0f;
+			Rales[i].translation_.z = Rales[i - 1].translation_.z + 5.0f;
 			Rales[i].parent_ = &Rales[i - 1];
 		}
 

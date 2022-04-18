@@ -56,6 +56,7 @@ class GameScene {
 	Sprite* sprite_ = nullptr;
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_[2];
+	WorldTransform Rales[100];
 	XMFLOAT3 ObjFront3D = {0,0,1};
 	ViewProjection viewProjection_;
 	int32_t value_ = 0;

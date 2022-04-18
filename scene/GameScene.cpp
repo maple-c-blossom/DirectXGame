@@ -25,7 +25,7 @@ void GameScene::Initialize() {
 	//soundHandle_ = audio_->LoadWave("se_sad03.wav");
 	//voiceHandle_ = audio_->PlayWave(soundHandle_, true);
 
-	viewProjection_.eye = {0, 10, -50};
+	viewProjection_.eye = {0, 0.5f, -100};
 
 	viewProjection_.target = {0, 0, 0};
 
@@ -40,6 +40,20 @@ void GameScene::Initialize() {
 	worldTransform_[1].parent_ = &worldTransform_[0];
 	worldTransform_[1].Initialize();
 
+	for (int i = 0; i < _countof(Rales); i++)
+	{
+		if (i == 0)
+		{
+			Rales[i].translation_ = { 0,-2.5f,0 };
+		}
+		else
+		{
+			Rales[i].translation_.z = Rales[i - 1].translation_.z + 10.0f;
+			Rales[i].parent_ = &Rales[i - 1];
+		}
+
+			Rales[i].Initialize();
+	}
 
 }
 
@@ -60,13 +74,13 @@ void GameScene::Update()
 
 	if (input_->PushKey(DIK_LEFT))
 	{
-		worldTransform_[0].rotation_.y += 0.05f;
+		worldTransform_[0].rotation_.y -= 0.05f;
 		ObjFront3D.x = sinf(worldTransform_[0].rotation_.y);
 		ObjFront3D.z = cosf(worldTransform_[0].rotation_.y);
 	}
 	else if (input_->PushKey(DIK_RIGHT))
 	{
-		worldTransform_[0].rotation_.y -= 0.05f;
+		worldTransform_[0].rotation_.y += 0.05f;
 		ObjFront3D.x = sinf(worldTransform_[0].rotation_.y);
 		ObjFront3D.z = cosf(worldTransform_[0].rotation_.y);
 	}
@@ -89,7 +103,6 @@ void GameScene::Update()
 	}
 
 
-	viewProjection_.UpdateMatrix();
 	#pragma endregion
 
 	worldTransform_[0].translation_.x += move.x;
@@ -97,9 +110,27 @@ void GameScene::Update()
 	worldTransform_[0].translation_.z += move.z;
 
 
+	viewProjection_.eye.x = worldTransform_[0].translation_.x + (50 * -ObjFront3D.x);
+	viewProjection_.eye.y = worldTransform_[0].translation_.y + 10;
+	viewProjection_.eye.z = worldTransform_[0].translation_.z + (50 * -ObjFront3D.z);
+
+	viewProjection_.target.x = worldTransform_[0].translation_.x;
+	viewProjection_.target.y = worldTransform_[0].translation_.y;
+	viewProjection_.target.z = worldTransform_[0].translation_.z;
+
+
+
+
+	viewProjection_.UpdateMatrix();
+
 	for (int i = 0; i < _countof(worldTransform_); i++) {
 	
 		worldTransform_[i].UpdateMatrix();
+	}
+
+	for (int i = 0; i < _countof(Rales); i++)
+	{
+		Rales[i].UpdateMatrix();
 	}
 
 	debugText_->SetPos(50, 70);
@@ -137,6 +168,11 @@ void GameScene::Draw() {
 	for (int i = 0; i < _countof(worldTransform_); i++) 
 	{
 		model_->Draw(worldTransform_[i], viewProjection_, textreHandle_);
+	}
+
+	for (int i = 0; i < _countof(Rales); i++)
+	{
+		model_->Draw(Rales[i], viewProjection_, textreHandle_);
 	}
 	/// </summary>
 

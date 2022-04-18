@@ -38,21 +38,18 @@ void GameScene::Initialize() {
 	uniform_real_distribution<float> rotDist(0.0f, XM_2PI);
 	uniform_real_distribution<float> posDist(-10.0f, 10.0f);
 
-	for (int i = 0; i < _countof(worldTransform_); i++) 
-	{
-		worldTransform_[i].scale_ = {1.0f, 1.0f, 1.0f};
-		worldTransform_[i].rotation_ = {rotDist(engin), rotDist(engin), rotDist(engin)};
-		worldTransform_[i].translation_ = {posDist(engin), posDist(engin), posDist(engin)};
-
-		worldTransform_[i].Initialize();
-	}
-
 	viewProjection_.fovAngleY = XMConvertToRadians(10.0f);
 
 	viewProjection_.aspectRatio = 1.0f;
 
-	viewProjection_.nearZ = 52.0f;
-	viewProjection_.farZ = 53.0f;
+	worldTransform_[0], Initialize();
+
+
+	worldTransform_[1].translation_ = {0, 4.5f, 0};
+	worldTransform_[1].parent_ = &worldTransform_[0];
+	worldTransform_[1].Initialize();
+
+
 }
 
 void GameScene::Update() 

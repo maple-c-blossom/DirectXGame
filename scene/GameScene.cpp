@@ -42,21 +42,32 @@ void GameScene::Initialize() {
 	worldTransform_[1].parent_ = &worldTransform_[0];
 	worldTransform_[1].Initialize();
 
-	for (int i = 0; i < _countof(Rales); i++)
+	for (int j = 0; j < 2; j++)
 	{
-		if (i == 0)
+		for (int i = 0; i < 100; i++)
 		{
-			Rales[i].translation_ = { 0,-2.5f,0 };
-		}
-		else
-		{
-			Rales[i].translation_.z = Rales[i - 1].translation_.z + 5.0f;
-			Rales[i].parent_ = &Rales[i - 1];
+			if (i == 0)
+			{
+				if (j == 0)
+				{
+					Rales[j][i].translation_ = { 0,-2.5f,0 };
+				}
+				else
+				{
+					Rales[j][i].translation_ = { 0,2.5f,0 };
+				}
+			}
+			else
+			{
+				Rales[j][i].translation_.x = Rales[j][i - 1].translation_.x + 3.0f;
+				Rales[j][i].translation_.y = Rales[j][i - 1].translation_.y;
+			}
+			Rales[j][i].scale_ = { 1.5f,1.5f,1.5f };
+			Rales[j][i].Initialize();
 		}
 
-			Rales[i].Initialize();
+
 	}
-
 	for (int i = 0; i < _countof(bullet); i++)
 	{
 		bullet[i].liveFlag = false;
@@ -124,7 +135,7 @@ void GameScene::Update()
 
 
 	viewProjection_.eye.x = worldTransform_[0].translation_.x + (20 * -FrontVec.x);
-	viewProjection_.eye.y = worldTransform_[0].translation_.y + 15;
+	viewProjection_.eye.y = worldTransform_[0].translation_.y;
 	viewProjection_.eye.z = worldTransform_[0].translation_.z + (20 * -FrontVec.z);
 
 	viewProjection_.target.x = worldTransform_[0].translation_.x;
@@ -141,9 +152,12 @@ void GameScene::Update()
 		worldTransform_[i].UpdateMatrix();
 	}
 
-	for (int i = 0; i < _countof(Rales); i++)
+	for (int j = 0; j < 2; j++)
 	{
-		Rales[i].UpdateMatrix();
+		for (int i = 0; i < 100; i++)
+		{
+			Rales[j][i].UpdateMatrix();
+		}
 	}
 
 
@@ -211,11 +225,14 @@ void GameScene::Draw() {
 		model_->Draw(worldTransform_[i], viewProjection_, textreHandle_);
 	}
 
-	for (int i = 0; i < _countof(Rales); i++)
+	for (int j = 0; j < 2; j++)
 	{
-		model_->Draw(Rales[i], viewProjection_, textreHandle_);
-	}
+		for (int i = 0; i < 100; i++)
+		{
+			model_->Draw(Rales[j][i], viewProjection_, textreHandle_);
+		}
 
+	}
 	for (int i = 0; i < _countof(bullet); i++)
 	{
 		if (bullet[i].liveFlag)

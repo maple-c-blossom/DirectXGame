@@ -57,7 +57,7 @@ class GameScene {
 	Sprite* sprite_ = nullptr;
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_[2];
-	WorldTransform Rales[100];
+	WorldTransform Rales[2][100];
 	Bullet bullet[20];
 
 	XMFLOAT3 FrontVec = {0,0,1};

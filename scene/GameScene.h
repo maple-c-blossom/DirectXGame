@@ -10,6 +10,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <DirectXMath.h>
+#include "Bullet.h"
 
 
 using namespace DirectX;
@@ -57,7 +58,9 @@ class GameScene {
 	Model* model_ = nullptr;
 	WorldTransform worldTransform_[2];
 	WorldTransform Rales[100];
-	XMFLOAT3 ObjFront3D = {0,0,1};
+	Bullet bullet[20];
+
+	XMFLOAT3 FrontVec = {0,0,1};
 	ViewProjection viewProjection_;
 	int32_t value_ = 0;
 	float viewAngle = 0.0f;

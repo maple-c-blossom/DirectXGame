@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include <random>
+#include "Bullet.h"
 
 using namespace DirectX;
 using namespace std;
@@ -56,6 +57,12 @@ void GameScene::Initialize() {
 			Rales[i].Initialize();
 	}
 
+	for (int i = 0; i < _countof(bullet); i++)
+	{
+		bullet[i].liveFlag = false;
+		bullet[i].worldTransform_.Initialize();
+	}
+
 }
 
 void GameScene::Update() 
@@ -70,20 +77,25 @@ void GameScene::Update()
 		worldTransform_[0].translation_ = {0.0f, 0.0f, 0.0f};
 		worldTransform_[0].rotation_ = { 0.0f,0.0f,0.0f };
 		worldTransform_[0].Initialize();
-		ObjFront3D = { 0,0,1 };
+		FrontVec = { 0,0,1 };
+		for (int i = 0; i < _countof(bullet); i++)
+		{
+			bullet[i].liveFlag = false;
+		}
+
 	}
 
 	if (input_->PushKey(DIK_LEFT))
 	{
 		worldTransform_[0].rotation_.y -= 0.05f;
-		ObjFront3D.x = sinf(worldTransform_[0].rotation_.y);
-		ObjFront3D.z = cosf(worldTransform_[0].rotation_.y);
+		FrontVec.x = sinf(worldTransform_[0].rotation_.y);
+		FrontVec.z = cosf(worldTransform_[0].rotation_.y);
 	}
 	else if (input_->PushKey(DIK_RIGHT))
 	{
 		worldTransform_[0].rotation_.y += 0.05f;
-		ObjFront3D.x = sinf(worldTransform_[0].rotation_.y);
-		ObjFront3D.z = cosf(worldTransform_[0].rotation_.y);
+		FrontVec.x = sinf(worldTransform_[0].rotation_.y);
+		FrontVec.z = cosf(worldTransform_[0].rotation_.y);
 	}
 
 
@@ -92,15 +104,15 @@ void GameScene::Update()
 
 	if (input_->PushKey(DIK_UP)) 
 	{
-		move.x = ObjFront3D.x * 1.0f;
-		move.y = ObjFront3D.y * 1.0f;
-		move.z = ObjFront3D.z * 1.0f;
+		move.x = FrontVec.x * 1.0f;
+		move.y = FrontVec.y * 1.0f;
+		move.z = FrontVec.z * 1.0f;
 	}
 	else if (input_->PushKey(DIK_DOWN)) 
 	{
-		move.x = ObjFront3D.x * -1.0f;
-		move.y = ObjFront3D.y * -1.0f;
-		move.z = ObjFront3D.z * -1.0f;
+		move.x = FrontVec.x * -1.0f;
+		move.y = FrontVec.y * -1.0f;
+		move.z = FrontVec.z * -1.0f;
 	}
 
 
@@ -111,9 +123,9 @@ void GameScene::Update()
 	worldTransform_[0].translation_.z += move.z;
 
 
-	viewProjection_.eye.x = worldTransform_[0].translation_.x + (20 * -ObjFront3D.x);
+	viewProjection_.eye.x = worldTransform_[0].translation_.x + (20 * -FrontVec.x);
 	viewProjection_.eye.y = worldTransform_[0].translation_.y + 15;
-	viewProjection_.eye.z = worldTransform_[0].translation_.z + (20 * -ObjFront3D.z);
+	viewProjection_.eye.z = worldTransform_[0].translation_.z + (20 * -FrontVec.z);
 
 	viewProjection_.target.x = worldTransform_[0].translation_.x;
 	viewProjection_.target.y = worldTransform_[0].translation_.y;
@@ -134,10 +146,38 @@ void GameScene::Update()
 		Rales[i].UpdateMatrix();
 	}
 
+
+	for (int i = 0; i < _countof(bullet); i++)
+	{
+		if (input_->TriggerKey(DIK_SPACE))
+		{
+			if (bullet[i].liveFlag == false)
+			{
+				bullet[i].Shoot(FrontVec,worldTransform_[0]);
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	for (int i = 0; i < _countof(bullet); i++)
+	{
+		if (bullet[i].liveFlag)
+		{
+			bullet[i].Update();
+			bullet[i].worldTransform_.UpdateMatrix();
+		}
+	}
+
+
 	debugText_->SetPos(50, 70);
 
 	debugText_->Printf(
-		"ObjFront3D : (%f,%f,%f)\n", ObjFront3D.x, ObjFront3D.y, ObjFront3D.z);
+		"ObjFront3D : (%f,%f,%f)  Bullet[0](%f,%f,%f)\n", worldTransform_->translation_.x, worldTransform_->translation_.y, worldTransform_->translation_.z,
+		bullet[0].worldTransform_.translation_.x, bullet[0].worldTransform_.translation_.y, bullet[0].worldTransform_.translation_.z);
 
 
 }
@@ -174,6 +214,14 @@ void GameScene::Draw() {
 	for (int i = 0; i < _countof(Rales); i++)
 	{
 		model_->Draw(Rales[i], viewProjection_, textreHandle_);
+	}
+
+	for (int i = 0; i < _countof(bullet); i++)
+	{
+		if (bullet[i].liveFlag)
+		{
+			model_->Draw(bullet[i].worldTransform_, viewProjection_, textreHandle_);
+		}
 	}
 	/// </summary>
 

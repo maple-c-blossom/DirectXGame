@@ -5,6 +5,7 @@
 #include "WinApp.h"
 #include "AxisIndicator.h"
 
+
 using namespace std;
 
 // Windowsアプリでのエントリーポイント(main関数)

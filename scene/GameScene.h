@@ -10,7 +10,11 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <DirectXMath.h>
+#include "Bullet.h"
 
+
+using namespace DirectX;
+using namespace std;
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -52,7 +56,11 @@ class GameScene {
 	uint32_t voiceHandle_ = 0;
 	Sprite* sprite_ = nullptr;
 	Model* model_ = nullptr;
-	WorldTransform worldTransform_[100];
+	WorldTransform worldTransform_[2];
+	WorldTransform Rales[100];
+	Bullet bullet[20];
+
+	XMFLOAT3 FrontVec = {0,0,1};
 	ViewProjection viewProjection_;
 	int32_t value_ = 0;
 	float viewAngle = 0.0f;
